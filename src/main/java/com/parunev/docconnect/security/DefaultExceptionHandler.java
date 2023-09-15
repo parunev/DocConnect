@@ -14,18 +14,40 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * The {@code DefaultExceptionHandler} class is responsible for globally handling exceptions
+ * that may occur during API requests and providing appropriate error responses.
+ */
 @RestControllerAdvice
 @RequiredArgsConstructor
 public class DefaultExceptionHandler {
     private static final String ERROR = "error";
 
+    /**
+     * Handle exceptions of type {@code CountryServiceException}.
+     * This method handles exceptions specific to the country service and returns the
+     * corresponding error response.
+     *
+     * @param ex The {@code CountryServiceException} instance to handle.
+     * @return A {@code ResponseEntity} containing the error response and HTTP status.
+     */
     @ExceptionHandler(CountryServiceException.class)
     public ResponseEntity<Object> handleCountryServiceException(CountryServiceException ex) {
         return new ResponseEntity<>(ex.getCountryResponse(), ex.getCountryResponse().getStatus());
     }
 
+    /**
+     * Handle exceptions of type {@code ConstraintViolationException}.
+     * This method handles validation exceptions and constructs an error response
+     * containing details about the validation errors.
+     *
+     * @param ex      The {@code ConstraintViolationException} instance to handle.
+     * @param request The HTTP servlet request associated with the exception.
+     * @return A {@code ResponseEntity} containing the error response with validation errors.
+     */
     @ExceptionHandler(ConstraintViolationException.class)
     public ResponseEntity<ConstraintError> handleValidationException(ConstraintViolationException ex, HttpServletRequest request) {
+        // Extract validation errors and build a response with error details.
         Map<String, String> errors = new HashMap<>();
 
         ex.getConstraintViolations().forEach(error -> {
@@ -41,6 +63,7 @@ public class DefaultExceptionHandler {
                 .timestamp(LocalDateTime.now())
                 .build();
 
+        // Return the response with validation error details and HTTP status.
         return new ResponseEntity<>(constraintError, HttpStatus.BAD_REQUEST);
     }
 }
