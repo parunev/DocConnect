@@ -1,5 +1,6 @@
 package com.parunev.docconnect.security;
 
+import com.parunev.docconnect.security.exceptions.CityServiceException;
 import com.parunev.docconnect.security.exceptions.CountryServiceException;
 import com.parunev.docconnect.security.payload.ConstraintError;
 import jakarta.servlet.http.HttpServletRequest;
@@ -34,6 +35,19 @@ public class DefaultExceptionHandler {
     @ExceptionHandler(CountryServiceException.class)
     public ResponseEntity<Object> handleCountryServiceException(CountryServiceException ex) {
         return new ResponseEntity<>(ex.getCountryResponse(), ex.getCountryResponse().getStatus());
+    }
+
+    /**
+     * Handle exceptions of type {@code CityServiceException}.
+     * This method handles exceptions specific to the city service and returns the
+     * corresponding error response.
+     *
+     * @param ex The {@code CityServiceException} instance to handle.
+     * @return A {@code ResponseEntity} containing the error response and HTTP status.
+     */
+    @ExceptionHandler(CityServiceException.class)
+    public ResponseEntity<Object> handleCityServiceException(CityServiceException ex) {
+        return new ResponseEntity<>(ex.getCityResponse(), ex.getCityResponse().getStatus());
     }
 
     /**

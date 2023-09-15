@@ -4,6 +4,8 @@ import com.parunev.docconnect.models.City;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 /**
  * The `CityRepository` interface provides access to the persistence layer
  * for managing `City` entities. It extends the Spring Data JPA
@@ -30,4 +32,7 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public interface CityRepository extends JpaRepository<City, Long> {
+    boolean existsByCityName(String cityName);
+
+    List<City> findAllByCountryId(Long id);
 }

@@ -33,6 +33,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorize ->
                         authorize
                                 .requestMatchers("/api/v1/countries/**").permitAll()
+                                .requestMatchers("/api/v1/cities/**").permitAll()
                                 .requestMatchers(
                                         "/v2/api-docs",
                                         "/v3/api-docs",

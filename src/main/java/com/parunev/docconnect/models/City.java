@@ -2,8 +2,7 @@ package com.parunev.docconnect.models;
 
 import com.parunev.docconnect.models.commons.BaseEntity;
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.*;
 
 import java.util.Set;
 /**
@@ -50,6 +49,9 @@ import java.util.Set;
  * @see com.parunev.docconnect.models.commons.BaseEntity
  */
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @Entity(name = "CITIES")
 @AttributeOverride(name = "id", column = @Column(name = "CITY_ID"))
