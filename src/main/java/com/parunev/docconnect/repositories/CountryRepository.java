@@ -30,4 +30,6 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public interface CountryRepository extends JpaRepository<Country, Long> {
+
+    boolean existsByCountryName(String countryName);
 }
