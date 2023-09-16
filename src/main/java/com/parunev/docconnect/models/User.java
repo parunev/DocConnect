@@ -176,7 +176,7 @@ public class User extends BaseEntity implements OAuth2User, UserDetails {
     /**
      * The provider-specific identifier for the user.
      */
-    @Column(name = "PROVIDER_ID", nullable = false)
+    @Column(name = "PROVIDER_ID")
     private String providerId;
 
     /**
@@ -190,6 +190,19 @@ public class User extends BaseEntity implements OAuth2User, UserDetails {
      */
     @Column(name = "IS_ENABLED", columnDefinition = "boolean default false")
     private boolean isEnabled;
+
+    /**
+     * Indicates whether the user has enabled the MFA authentication.
+     */
+    @Column(name = "MFA_ENABLED", columnDefinition = "boolean default false")
+    private boolean mfaEnabled;
+
+    /**
+     * The MFA authentication secret key.
+     */
+    @Column(name = "MFA_SECRET")
+    private String mfaSecret;
+
 
     /**
      * Additional attributes associated with the user, typically used in OAuth2

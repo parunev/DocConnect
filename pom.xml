@@ -170,6 +170,19 @@
             <version>1.0.3</version>
         </dependency>
 
+        <dependency>
+            <groupId>dev.samstevens.totp</groupId>
+            <artifactId>totp</artifactId>
+            <version>1.7.1</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>jcommander</artifactId>
+                    <groupId>com.beust</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+
     </dependencies>
 
     <build>

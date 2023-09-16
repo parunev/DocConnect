@@ -1,8 +1,11 @@
 package com.parunev.docconnect.security;
 
-import com.parunev.docconnect.security.exceptions.CityServiceException;
-import com.parunev.docconnect.security.exceptions.CountryServiceException;
+import com.parunev.docconnect.models.payloads.city.CityResponse;
+import com.parunev.docconnect.models.payloads.country.CountryResponse;
+import com.parunev.docconnect.security.exceptions.*;
+import com.parunev.docconnect.security.payload.AuthenticationError;
 import com.parunev.docconnect.security.payload.ConstraintError;
+import com.parunev.docconnect.security.payload.EmailError;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
 import lombok.RequiredArgsConstructor;
@@ -33,7 +36,7 @@ public class DefaultExceptionHandler {
      * @return A {@code ResponseEntity} containing the error response and HTTP status.
      */
     @ExceptionHandler(CountryServiceException.class)
-    public ResponseEntity<Object> handleCountryServiceException(CountryServiceException ex) {
+    public ResponseEntity<CountryResponse> handleCountryServiceException(CountryServiceException ex) {
         return new ResponseEntity<>(ex.getCountryResponse(), ex.getCountryResponse().getStatus());
     }
 
@@ -46,8 +49,75 @@ public class DefaultExceptionHandler {
      * @return A {@code ResponseEntity} containing the error response and HTTP status.
      */
     @ExceptionHandler(CityServiceException.class)
-    public ResponseEntity<Object> handleCityServiceException(CityServiceException ex) {
+    public ResponseEntity<CityResponse> handleCityServiceException(CityServiceException ex) {
         return new ResponseEntity<>(ex.getCityResponse(), ex.getCityResponse().getStatus());
+    }
+
+
+    /**
+     * Handle exceptions of type {@code EmailSenderException}.
+     * This method handles exceptions specific to the email sender and returns the
+     * corresponding error response.
+     *
+     * @param ex The {@code EmailSenderException} instance to handle.
+     * @return A {@code EmailError} containing the error response and HTTP status.
+     */
+    @ExceptionHandler(EmailSenderException.class)
+    public ResponseEntity<EmailError> handleEmailSenderException(EmailSenderException ex) {
+        return new ResponseEntity<>(ex.getEmailError(), ex.getEmailError().getStatus());
+    }
+
+    /**
+     * Handle exceptions of type {@code EmailAlreadyExistsAuthenticationException}.
+     * This method handles exceptions specific to the email already exists exception and returns the
+     * corresponding error response.
+     *
+     * @param ex The {@code EmailAlreadyExistsAuthenticationException} instance to handle.
+     * @return A {@code AuthenticationError} containing the error response and HTTP status.
+     */
+    @ExceptionHandler(EmailAlreadyExistsAuthenticationException.class)
+    public ResponseEntity<AuthenticationError> handleEmailAlreadyExistsAuthenticationException
+            (EmailAlreadyExistsAuthenticationException ex) {
+        return new ResponseEntity<>(ex.getAuthenticationError(), ex.getAuthenticationError().getStatus());
+    }
+
+    /**
+     * Handle exceptions of type {@code OtpValidationException}.
+     * This method handles exceptions specific to the OTP validation exception and returns the
+     * corresponding error response.
+     *
+     * @param ex The {@code OtpValidationException} instance to handle.
+     * @return A {@code String} containing the error response and HTTP status.
+     */
+    @ExceptionHandler(OtpValidationException.class)
+    public ResponseEntity<String> handleOtpValidationException(OtpValidationException ex) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    /**
+     * Handle exceptions of type {@code InvalidEmailTokenException}.
+     * This method handles exceptions specific to the invalid email token exception and returns the
+     * corresponding error response.
+     *
+     * @param ex The {@code InvalidEmailTokenException} instance to handle.
+     * @return A {@code EmailError} containing the error response and HTTP status.
+     */
+    @ExceptionHandler(InvalidEmailTokenException.class)
+    public ResponseEntity<EmailError> handleInvalidEmailTokenException(InvalidEmailTokenException ex) {
+        return new ResponseEntity<>(ex.getEmailError(), ex.getEmailError().getStatus());
+    }
+
+    /**
+     * Handle exceptions of type {@code AuthenticationException}.
+     * This method handles exceptions specific to the authentication exception and returns the
+     * corresponding error response.
+     *
+     * @param ex The {@code AuthenticationException} instance to handle.
+     * @return A {@code AuthenticationError} containing the error response and HTTP status.
+     */
+    @ExceptionHandler(InvalidLoginException.class)
+    public ResponseEntity<AuthenticationError> handleAuthenticationException(InvalidLoginException ex) {
+        return new ResponseEntity<>(ex.getAuthenticationError(), ex.getAuthenticationError().getStatus());
     }
 
     /**

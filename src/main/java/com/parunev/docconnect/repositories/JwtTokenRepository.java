@@ -2,7 +2,11 @@ package com.parunev.docconnect.repositories;
 
 import com.parunev.docconnect.models.JwtToken;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
+
+import java.util.List;
+import java.util.Optional;
 
 /**
  * The `JwtTokenRepository` interface provides access to the persistence layer
@@ -30,4 +34,12 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public interface JwtTokenRepository extends JpaRepository<JwtToken, Long> {
+
+    @Query("""
+        SELECT J FROM JWT_TOKENS J INNER JOIN USERS U ON J.user.id = U.id
+        WHERE U.id = :userId AND (J.isExpired = false OR J.isRevoked = false)
+    """)
+    List<JwtToken> findAllValidTokensByUser(Long userId);
+
+    Optional<JwtToken> findByToken(String token);
 }
