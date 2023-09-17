@@ -1,5 +1,6 @@
 package com.parunev.docconnect.utils.annotations.password;
 
+import com.parunev.docconnect.models.payloads.user.login.ResetPasswordRequest;
 import com.parunev.docconnect.models.payloads.user.profile.PasswordChangeRequest;
 import com.parunev.docconnect.models.payloads.user.registration.RegistrationRequest;
 import jakarta.validation.ConstraintValidator;
@@ -32,15 +33,22 @@ public class PasswordConfirmationValidator implements ConstraintValidator<Passwo
         if (obj == null) {
             return true;
         }
+        String password;
+        String confirmPassword;
 
         if (obj instanceof RegistrationRequest yourClass) {
-            String password = yourClass.getPassword();
-            String confirmPassword = yourClass.getConfirmPassword();
+            password = yourClass.getPassword();
+            confirmPassword = yourClass.getConfirmPassword();
 
             return password != null && password.equals(confirmPassword);
         } else if (obj instanceof PasswordChangeRequest yourClass) {
-            String password = yourClass.getNewPassword();
-            String confirmPassword = yourClass.getConfirmNewPassword();
+            password = yourClass.getNewPassword();
+            confirmPassword = yourClass.getConfirmNewPassword();
+
+            return password != null && password.equals(confirmPassword);
+        } else if (obj instanceof ResetPasswordRequest yourClass){
+            password = yourClass.getResetPassword();
+            confirmPassword = yourClass.getConfirmResetPassword();
 
             return password != null && password.equals(confirmPassword);
         }

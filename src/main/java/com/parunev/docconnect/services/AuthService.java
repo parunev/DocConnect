@@ -1,16 +1,15 @@
 package com.parunev.docconnect.services;
 
 import com.parunev.docconnect.models.ConfirmationToken;
+import com.parunev.docconnect.models.PasswordToken;
 import com.parunev.docconnect.models.User;
 import com.parunev.docconnect.models.UserProfile;
 import com.parunev.docconnect.models.enums.AuthProvider;
 import com.parunev.docconnect.models.enums.Role;
-import com.parunev.docconnect.models.payloads.user.login.LoginRequest;
-import com.parunev.docconnect.models.payloads.user.login.LoginResponse;
-import com.parunev.docconnect.models.payloads.user.login.VerificationRequest;
-import com.parunev.docconnect.models.payloads.user.login.VerificationResponse;
+import com.parunev.docconnect.models.payloads.user.login.*;
 import com.parunev.docconnect.models.payloads.user.registration.RegistrationRequest;
 import com.parunev.docconnect.models.payloads.user.registration.RegistrationResponse;
+import com.parunev.docconnect.repositories.PasswordTokenRepository;
 import com.parunev.docconnect.repositories.UserProfileRepository;
 import com.parunev.docconnect.repositories.UserRepository;
 import com.parunev.docconnect.security.exceptions.InvalidEmailTokenException;
@@ -34,6 +33,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 import java.util.UUID;
 
 import static com.parunev.docconnect.utils.email.Patterns.buildConfirmationEmail;
@@ -46,6 +46,7 @@ import static com.parunev.docconnect.utils.email.Patterns.buildConfirmationEmail
 @RequiredArgsConstructor
 public class AuthService {
     private final UserRepository userRepository;
+    private final PasswordTokenRepository passwordTokenRepository;
     private final UserProfileRepository userProfileRepository;
     private final AuthHelpers authHelpers;
     private final PasswordEncoder passwordEncoder;
@@ -243,6 +244,83 @@ public class AuthService {
                 .path(authHelpers.getRequest().getRequestURI())
                 .message("2FA code sent successfully!")
                 .emailAddress(verificationRequest.getEmail())
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.OK)
+                .build();
+    }
+
+    /**
+     * Sends a forgot password email to the user, allowing them to reset their password.
+     *
+     * @param request The request object containing the user's email address.
+     * @return A {@link ForgotPasswordResponse} indicating the result of sending the email.
+     */
+    public ForgotPasswordResponse sendForgotPasswordEmail(@Valid ForgotPasswordRequest request){
+        dcLogger.info("Sending forgot password email to user: {}", request.getEmailAddress());
+
+        User user = authHelpers.returnUserIfPresent(request.getEmailAddress());
+        PasswordToken passwordToken = PasswordToken.builder()
+                .token(UUID.randomUUID().toString())
+                .expiresAt(LocalDateTime.now().plusHours(24))
+                .user(user)
+                .build();
+
+        dcLogger.info("Saving password token to database for user: {}", user.getEmail());
+        passwordTokenRepository.save(passwordToken);
+
+        dcLogger.info("Sending password reset email to user: {}", user.getEmail());
+        // Should redirect to front-end page for better understand how does it work
+        emailSender.send(user.getEmail(), buildConfirmationEmail(user.getName()
+                        , CONFIRMATION_LINK + passwordToken.getToken()),
+                "DocConnect: Reset your password");
+
+        return ForgotPasswordResponse.builder()
+                .path(authHelpers.getRequest().getRequestURI())
+                // For test purposes!!!
+                .message("Password reset email sent successfully!" + passwordToken.getToken())
+                .emailAddress(request.getEmailAddress())
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.OK)
+                .build();
+    }
+
+    /**
+     * Resets the password for a user using a valid reset password token.
+     *
+     * @param request The request object containing the reset password token and the new password.
+     * @return A {@link ForgotPasswordResponse} indicating the result of the password reset.
+     * @throws InvalidEmailTokenException If the token is not found or is already used.
+     */
+    public ForgotPasswordResponse resetPassword(@Valid ResetPasswordRequest request){
+        dcLogger.info("Resetting password for user with token: {}", request.getToken());
+
+        PasswordToken passwordToken = Optional.ofNullable(passwordTokenRepository.findByToken(request.getToken()))
+                .flatMap(byToken -> byToken
+                        .filter(
+                                reset ->
+                                        reset.getUsedAt() == null
+                                                && reset
+                                                .getExpiresAt()
+                                                .isAfter(LocalDateTime.now())))
+                .orElseThrow(
+                        () -> {
+                            dcLogger.warn("Token not found or is already used!");
+                            throw new InvalidEmailTokenException(EmailError.builder()
+                                    .path(authHelpers.getRequest().getRequestURI())
+                                    .error("Token not found or is already used!")
+                                    .timestamp(LocalDateTime.now())
+                                    .status(HttpStatus.BAD_REQUEST)
+                                    .build());
+                        });
+
+        User user = passwordToken.getUser();
+        user.setPassword(passwordEncoder.encode(request.getResetPassword()));
+
+        userRepository.save(user);
+        return ForgotPasswordResponse.builder()
+                .path(authHelpers.getRequest().getRequestURI())
+                .message("Password reset successfully!")
+                .emailAddress(user.getEmail())
                 .timestamp(LocalDateTime.now())
                 .status(HttpStatus.OK)
                 .build();

@@ -58,7 +58,7 @@ public class SecurityConfig {
                             }
 
                             String message = preAuthorize == null ?
-                                    "Something went wrong! Please contact the administrator." :
+                                    authException.getMessage() :
                                     "Authorization condition not met: " + preAuthorize.value();
 
                             response.getWriter().write(objectMapper.writeValueAsString(

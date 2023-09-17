@@ -1,9 +1,6 @@
 package com.parunev.docconnect.controllers;
 
-import com.parunev.docconnect.models.payloads.user.login.LoginRequest;
-import com.parunev.docconnect.models.payloads.user.login.LoginResponse;
-import com.parunev.docconnect.models.payloads.user.login.VerificationRequest;
-import com.parunev.docconnect.models.payloads.user.login.VerificationResponse;
+import com.parunev.docconnect.models.payloads.user.login.*;
 import com.parunev.docconnect.models.payloads.user.registration.RegistrationRequest;
 import com.parunev.docconnect.models.payloads.user.registration.RegistrationResponse;
 import com.parunev.docconnect.services.AuthService;
@@ -42,6 +39,24 @@ public class AuthController {
             @RequestBody LoginRequest request) {
         dcLogger.info("Login request received for user: {}", request.getEmailAddress());
         return new ResponseEntity<>(authService.login(request), HttpStatus.OK);
+    }
+
+    @ApiForgotPassword
+    @PostMapping("/login/forgot-password")
+    public ResponseEntity<ForgotPasswordResponse> forgotPassword(
+            @Parameter(description = "Payload for forgot password")
+            @RequestBody ForgotPasswordRequest request) {
+        dcLogger.info("Forgot password request received for user: {}", request.getEmailAddress());
+        return new ResponseEntity<>(authService.sendForgotPasswordEmail(request), HttpStatus.OK);
+    }
+
+    @ApiPasswordReset
+    @PostMapping("/login/reset-password")
+    public ResponseEntity<ForgotPasswordResponse> resetPassword(
+            @Parameter(description = "Payload for resetting password")
+            @RequestBody ResetPasswordRequest request) {
+        dcLogger.info("Reset password request received for user with token: {}", request.getToken());
+        return new ResponseEntity<>(authService.resetPassword(request), HttpStatus.OK);
     }
 
     @ApiSendCode
