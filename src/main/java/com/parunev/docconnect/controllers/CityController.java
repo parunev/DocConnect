@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -24,6 +25,7 @@ public class CityController {
 
     @ApiAddCity
     @PostMapping
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<CityResponse> addCity(
             @Parameter(description = "City request object", required = true)
             @RequestBody CityRequest request) {
@@ -33,6 +35,7 @@ public class CityController {
 
     @ApiUpdateCity
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<CityResponse> updateCity(
             @Parameter(description = "City id", required = true)
             @PathVariable Long id,
@@ -44,6 +47,7 @@ public class CityController {
 
     @ApiDeleteCity
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<CityResponse> deleteCity(
             @Parameter(description = "City id", required = true)
             @PathVariable Long id) {

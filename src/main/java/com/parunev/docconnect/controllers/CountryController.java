@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,8 +22,9 @@ public class CountryController {
     private final CountryService countryService;
     private final DCLogger dcLogger = new DCLogger(CountryController.class);
 
-    @PostMapping
     @ApiAddCountry
+    @PostMapping
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<CountryResponse> addCountry(
             @Parameter(description = "Country data to be added. Cannot be empty.", required = true)
             @RequestBody CountryRequest request){
@@ -30,8 +32,9 @@ public class CountryController {
         return ResponseEntity.ok(countryService.addCountry(request));
     }
 
-    @PutMapping("/{id}")
     @ApiUpdateCountry
+    @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<CountryResponse> updateCountry(
             @Parameter(description = "ID of the country to be updated. Cannot be empty.", required = true)
             @PathVariable Long id,
@@ -41,8 +44,9 @@ public class CountryController {
         return ResponseEntity.ok(countryService.updateCountry(id, request));
     }
 
-    @DeleteMapping("/{id}")
     @ApiDeleteCountry
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<CountryResponse> deleteCountry(
             @Parameter(description = "ID of the country to be deleted. Cannot be empty.", required = true)
             @PathVariable Long id){
@@ -50,15 +54,15 @@ public class CountryController {
         return ResponseEntity.ok(countryService.deleteCountry(id));
     }
 
-    @GetMapping
     @ApiGetAllCountries
+    @GetMapping
     public ResponseEntity<List<CountryResponse>> getAllCountries(){
         dcLogger.info("Request to get all countries");
         return ResponseEntity.ok(countryService.getAllCountries());
     }
 
-    @GetMapping("/{id}")
     @ApiGetCountryById
+    @GetMapping("/{id}")
     public ResponseEntity<CountryResponse> getCountryById(
             @Parameter(description = "ID of the country to be obtained. Cannot be empty.", required = true)
             @PathVariable Long id){
