@@ -4,6 +4,7 @@ import com.parunev.docconnect.models.payloads.city.CityResponse;
 import com.parunev.docconnect.models.payloads.country.CountryResponse;
 import com.parunev.docconnect.models.payloads.specialty.SpecialtyResponse;
 import com.parunev.docconnect.security.exceptions.*;
+import com.parunev.docconnect.security.payload.ApiError;
 import com.parunev.docconnect.security.payload.AuthenticationError;
 import com.parunev.docconnect.security.payload.ConstraintError;
 import com.parunev.docconnect.security.payload.EmailError;
@@ -158,6 +159,25 @@ public class DefaultExceptionHandler {
     @ExceptionHandler(SpecialtyServiceException.class)
     public ResponseEntity<SpecialtyResponse> handleSpecialtyServiceException(SpecialtyServiceException ex) {
         return new ResponseEntity<>(ex.getSpecialtyResponse(), ex.getSpecialtyResponse().getStatus());
+    }
+
+    /**
+     * Handle exceptions of type {@code Exception} and {@code RuntimeException}.
+     * This method handles all other exceptions and returns the corresponding error response.
+     *
+     * @param e       The {@code Exception} instance to handle.
+     * @param request The HTTP servlet request associated with the exception.
+     * @return A {@code ResponseEntity} containing the error response and HTTP status.
+     */
+    @ExceptionHandler({Exception.class, RuntimeException.class})
+    public ResponseEntity<ApiError> handleException
+            (Exception e, HttpServletRequest request) {
+        return new ResponseEntity<>(ApiError.builder()
+                .path(request.getRequestURI())
+                .error(e.getMessage())
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .timestamp(LocalDateTime.now())
+                .build(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     /**
