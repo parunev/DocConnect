@@ -2,6 +2,7 @@ package com.parunev.docconnect.security;
 
 import com.parunev.docconnect.models.payloads.city.CityResponse;
 import com.parunev.docconnect.models.payloads.country.CountryResponse;
+import com.parunev.docconnect.models.payloads.specialty.SpecialtyResponse;
 import com.parunev.docconnect.security.exceptions.*;
 import com.parunev.docconnect.security.payload.AuthenticationError;
 import com.parunev.docconnect.security.payload.ConstraintError;
@@ -144,6 +145,19 @@ public class DefaultExceptionHandler {
     @ExceptionHandler(InvalidPasswordChangeException.class)
     public ResponseEntity<AuthenticationError> handleInvalidPasswordChangeException(InvalidPasswordChangeException ex) {
         return new ResponseEntity<>(ex.getAuthenticationError(), ex.getAuthenticationError().getStatus());
+    }
+
+    /**
+     * Handle exceptions of type {@code SpecialtyServiceException}.
+     * This method handles exceptions specific to the specialty service and returns the
+     * corresponding error response.
+     *
+     * @param ex The {@code SpecialtyServiceException} instance to handle.
+     * @return A {@code ResponseEntity} containing the error response and HTTP status.
+     */
+    @ExceptionHandler(SpecialtyServiceException.class)
+    public ResponseEntity<SpecialtyResponse> handleSpecialtyServiceException(SpecialtyServiceException ex) {
+        return new ResponseEntity<>(ex.getSpecialtyResponse(), ex.getSpecialtyResponse().getStatus());
     }
 
     /**
