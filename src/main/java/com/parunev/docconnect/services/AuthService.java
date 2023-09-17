@@ -2,6 +2,7 @@ package com.parunev.docconnect.services;
 
 import com.parunev.docconnect.models.ConfirmationToken;
 import com.parunev.docconnect.models.User;
+import com.parunev.docconnect.models.UserProfile;
 import com.parunev.docconnect.models.enums.AuthProvider;
 import com.parunev.docconnect.models.enums.Role;
 import com.parunev.docconnect.models.payloads.user.login.LoginRequest;
@@ -10,6 +11,7 @@ import com.parunev.docconnect.models.payloads.user.login.VerificationRequest;
 import com.parunev.docconnect.models.payloads.user.login.VerificationResponse;
 import com.parunev.docconnect.models.payloads.user.registration.RegistrationRequest;
 import com.parunev.docconnect.models.payloads.user.registration.RegistrationResponse;
+import com.parunev.docconnect.repositories.UserProfileRepository;
 import com.parunev.docconnect.repositories.UserRepository;
 import com.parunev.docconnect.security.exceptions.InvalidEmailTokenException;
 import com.parunev.docconnect.security.exceptions.InvalidLoginException;
@@ -44,6 +46,7 @@ import static com.parunev.docconnect.utils.email.Patterns.buildConfirmationEmail
 @RequiredArgsConstructor
 public class AuthService {
     private final UserRepository userRepository;
+    private final UserProfileRepository userProfileRepository;
     private final AuthHelpers authHelpers;
     private final PasswordEncoder passwordEncoder;
     private final EmailSender emailSender;
@@ -54,7 +57,7 @@ public class AuthService {
     private final ConfirmationTokenService confirmationTokenService;
     private final JwtService jwtService;
 
-    private final static String CONFIRMATION_LINK = "http://localhost:8080/api/v1/auth/register/confirm?token=";
+    public final static String CONFIRMATION_LINK = "http://localhost:8080/api/v1/auth/register/confirm?token=";
 
     /**
      * Register a new user with the provided registration request.
@@ -77,6 +80,9 @@ public class AuthService {
                 .provider(AuthProvider.LOCAL)
                 .build());
         dcLogger.info("User saved to database: {}", user.getEmail());
+
+        userProfileRepository.save(UserProfile.builder().user(user).build());
+        dcLogger.info("User profile saved to database: {}", user.getEmail());
 
         dcLogger.info("Generating confirmation token for user: {}", user.getEmail());
         ConfirmationToken confirmationToken = ConfirmationToken.builder()
@@ -223,6 +229,12 @@ public class AuthService {
                 true);
     }
 
+    /**
+     * Sends a two-factor authentication (2FA) code to the user's email address.
+     *
+     * @param verificationRequest The verification request containing the user's email.
+     * @return A VerificationResponse indicating the status of the 2FA code sending process.
+     */
     public VerificationResponse sendVerificationCode(VerificationRequest verificationRequest) {
         dcLogger.info("Sending 2FA code to user: {}", verificationRequest.getEmail());
         User user = authHelpers.returnUserIfPresent(verificationRequest.getEmail());

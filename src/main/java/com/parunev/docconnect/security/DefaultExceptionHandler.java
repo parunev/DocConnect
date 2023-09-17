@@ -121,6 +121,32 @@ public class DefaultExceptionHandler {
     }
 
     /**
+     * Handle exceptions of type {@code UserNotFoundException}.
+     * This method handles exceptions specific to the user not found exception and returns the
+     * corresponding error response.
+     *
+     * @param ex The {@code UserNotFoundException} instance to handle.
+     * @return A {@code AuthenticationError} containing the error response and HTTP status.
+     */
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<AuthenticationError> handleUserNotFoundException(UserNotFoundException ex) {
+        return new ResponseEntity<>(ex.getError(), ex.getError().getStatus());
+    }
+
+    /**
+     * Handle exceptions of type {@code InvalidPasswordChangeException}.
+     * This method handles exceptions specific to the invalid password change exception and returns the
+     * corresponding error response.
+     *
+     * @param ex The {@code InvalidPasswordChangeException} instance to handle.
+     * @return A {@code AuthenticationError} containing the error response and HTTP status.
+     */
+    @ExceptionHandler(InvalidPasswordChangeException.class)
+    public ResponseEntity<AuthenticationError> handleInvalidPasswordChangeException(InvalidPasswordChangeException ex) {
+        return new ResponseEntity<>(ex.getAuthenticationError(), ex.getAuthenticationError().getStatus());
+    }
+
+    /**
      * Handle exceptions of type {@code ConstraintViolationException}.
      * This method handles validation exceptions and constructs an error response
      * containing details about the validation errors.
