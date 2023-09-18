@@ -1,12 +1,19 @@
 package com.parunev.docconnect.services;
 
 import com.parunev.docconnect.models.PasswordToken;
+import com.parunev.docconnect.models.Rating;
 import com.parunev.docconnect.models.enums.Role;
+import com.parunev.docconnect.models.payloads.city.CityResponse;
+import com.parunev.docconnect.models.payloads.country.CountryResponse;
+import com.parunev.docconnect.models.payloads.specialist.SpecialistAddressResponse;
 import com.parunev.docconnect.models.payloads.specialist.SpecialistRegistrationRequest;
+import com.parunev.docconnect.models.payloads.specialist.SpecialistResponse;
+import com.parunev.docconnect.models.payloads.specialty.SpecialtyResponse;
 import com.parunev.docconnect.models.payloads.user.login.*;
 import com.parunev.docconnect.models.payloads.user.registration.RegistrationResponse;
 import com.parunev.docconnect.models.specialist.Specialist;
 import com.parunev.docconnect.repositories.PasswordTokenRepository;
+import com.parunev.docconnect.repositories.RatingRepository;
 import com.parunev.docconnect.repositories.SpecialistRepository;
 import com.parunev.docconnect.security.exceptions.AlreadyEnabledException;
 import com.parunev.docconnect.security.exceptions.InvalidLoginException;
@@ -21,6 +28,9 @@ import com.parunev.docconnect.utils.validators.AuthHelpers;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -29,6 +39,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 import static com.parunev.docconnect.services.AuthService.CONFIRMATION_LINK;
@@ -42,6 +53,7 @@ public class SpecialistService {
 
     private final SpecialistRepository specialistRepository;
     private final PasswordTokenRepository passwordTokenRepository;
+    private final RatingRepository ratingRepository;
     private final AuthHelpers authHelpers;
     private final PasswordEncoder passwordEncoder;
     private final EmailSender emailSender;
@@ -50,6 +62,7 @@ public class SpecialistService {
     private final Google2FAuthentication google2FAuthentication;
     private final Email2FAuthentication email2FAuthentication;
     private final JwtService jwtService;
+    private final ModelMapper modelMapper;
 
     /**
      * Registers a new specialist.
@@ -291,5 +304,87 @@ public class SpecialistService {
                 "Password reset successfully!",
                 specialist.getEmail(),
                 HttpStatus.OK);
+    }
+
+    /**
+     * Retrieves information about a specialist with the given ID and calculates the average rating.
+     *
+     * @param specialistId The unique identifier of the specialist to retrieve.
+     * @return A {@link SpecialistResponse} object containing specialist details and average rating.
+     * @throws SpecialistNotFoundException If the specialist with the provided ID is not found.
+     */
+    public SpecialistResponse returnASpecialist(Long specialistId) {
+        dcLogger.info("Returning specialist with ID: {}", specialistId);
+
+        Specialist specialist = specialistRepository.findById(specialistId)
+                .orElseThrow(() -> {
+                    dcLogger.warn("Specialist not found for ID: {}", specialistId);
+                    throw new SpecialistNotFoundException(AuthenticationError.builder()
+                            .path(authHelpers.getRequest().getRequestURI())
+                            .error("Specialist not found.")
+                            .timestamp(LocalDateTime.now())
+                            .status(HttpStatus.NOT_FOUND)
+                            .build());
+                });
+
+        List<Rating> specialistRatings = ratingRepository.findAllBySpecialistId(specialist.getId());
+
+        dcLogger.debug("Returned specialist with ID {}: {}", specialistId, specialist.getFirstName() + " " + specialist.getLastName());
+        Double averageRating = specialistRatings.stream().mapToDouble(Rating::getRatingSize).average().orElse(0.0);
+
+        return buildSpecialResponse(specialist, averageRating);
+    }
+
+    /**
+     * Searches for specialists based on specified filters, and returns a pageable list of SpecialistResponse objects.
+     *
+     * @param cityId      The ID of the city to filter specialists by (can be null for no city filter).
+     * @param name        The name or part of the name of specialists to search for (can be null for no name filter).
+     * @param specialtyId The ID of the specialty to filter specialists by (can be null for no specialty filter).
+     * @param pageable    The paging and sorting configuration for the results.
+     * @return A pageable list of {@link SpecialistResponse} objects matching the search criteria.
+     */
+    public Page<SpecialistResponse> searchDoctorsPageable(Long cityId, String name, Long specialtyId, Pageable pageable) {
+        try {
+            Page<Object[]> specialistsPage = specialistRepository.searchDoctorsPageable(name, specialtyId, cityId, pageable);
+
+            Page<SpecialistResponse> specialistsDtoPage = specialistsPage.map(row -> {
+                Specialist specialist = (Specialist) row[0];
+                Double averageRating = (Double) row[1];
+
+                SpecialistResponse specialistDto = modelMapper.map(specialist, SpecialistResponse.class);
+                if (averageRating == null) averageRating = 0.0;
+                specialistDto.setRating(averageRating);
+                return buildSpecialResponse(specialist, averageRating);
+            });
+
+            dcLogger.debug("Retrieved {} specialists with filters: cityId={}, name={}, specialtyId={}, pageSize={}, pageNum={}",
+                    specialistsDtoPage.getTotalElements(), cityId, name, specialtyId, pageable.getPageSize(), pageable.getPageNumber());
+            return specialistsDtoPage;
+        } catch (Exception e) {
+            dcLogger.error("Failed to search specialists Message: {}, Cause: {}"
+                    , e, e.getMessage(), e.getCause());
+            return Page.empty();
+        }
+    }
+
+    private SpecialistResponse buildSpecialResponse(Specialist specialist, Double averageRating){
+        return SpecialistResponse.builder()
+                .id(specialist.getId())
+                .firstName(specialist.getFirstName())
+                .lastName(specialist.getLastName())
+                .phoneNumber(specialist.getPhoneNumber())
+                .email(specialist.getEmail())
+                .summary(specialist.getSummary())
+                .experienceYears(specialist.getExperienceYears())
+                .city(modelMapper.map(specialist.getCity(), CityResponse.class))
+                .country(modelMapper.map(specialist.getCountry(), CountryResponse.class))
+                .specialty(modelMapper.map(specialist.getSpecialty(), SpecialtyResponse.class))
+                .imageUrl(specialist.getImageUrl())
+                .addresses(specialist.getAddresses().stream()
+                        .map(address -> modelMapper.map(address, SpecialistAddressResponse.class))
+                        .toList())
+                .rating(averageRating)
+                .build();
     }
 }

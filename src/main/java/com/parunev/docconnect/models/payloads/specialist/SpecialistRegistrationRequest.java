@@ -5,18 +5,12 @@ import com.parunev.docconnect.utils.annotations.password.PasswordConfirmation;
 import com.parunev.docconnect.utils.annotations.uri.IsValidUri;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.Length;
 
 import java.util.List;
 
 @Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
 @PasswordConfirmation
 @Schema(name = "Specialist Registration Request", description = "Payload for specialist registration")
 public class SpecialistRegistrationRequest {

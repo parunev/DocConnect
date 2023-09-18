@@ -188,6 +188,18 @@ public class DefaultExceptionHandler {
     }
 
     /**
+     * Handle exceptions of type {@code RatingNotFoundException}.
+     * This method handles exceptions specific to the rating not found exception and returns the
+     * corresponding error response.
+     * @param ex The {@code RatingNotFoundException} instance to handle.
+     * @return A {@code ApiError} containing the error response and HTTP status.
+     */
+    @ExceptionHandler(RatingNotFoundException.class)
+    public ResponseEntity<ApiError> handleRatingNotFoundException(RatingNotFoundException ex) {
+        return new ResponseEntity<>(ex.getError(), ex.getError().getStatus());
+    }
+
+    /**
      * Handle exceptions of type {@code Exception} and {@code RuntimeException}.
      * This method handles all other exceptions and returns the corresponding error response.
      *

@@ -3,15 +3,9 @@ package com.parunev.docconnect.models.payloads.user.profile;
 import com.parunev.docconnect.utils.annotations.uri.IsValidUri;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 @Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
 @Schema(name = "Profile Request", description = "Request for profile update")
 public class ProfileRequest {
 
