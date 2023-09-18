@@ -1,5 +1,6 @@
 package com.parunev.docconnect.utils.annotations.password;
 
+import com.parunev.docconnect.models.payloads.specialist.SpecialistRegistrationRequest;
 import com.parunev.docconnect.models.payloads.user.login.ResetPasswordRequest;
 import com.parunev.docconnect.models.payloads.user.profile.PasswordChangeRequest;
 import com.parunev.docconnect.models.payloads.user.registration.RegistrationRequest;
@@ -49,6 +50,11 @@ public class PasswordConfirmationValidator implements ConstraintValidator<Passwo
         } else if (obj instanceof ResetPasswordRequest yourClass){
             password = yourClass.getResetPassword();
             confirmPassword = yourClass.getConfirmResetPassword();
+
+            return password != null && password.equals(confirmPassword);
+        } else if (obj instanceof SpecialistRegistrationRequest yourClass){
+            password = yourClass.getPassword();
+            confirmPassword = yourClass.getConfirmPassword();
 
             return password != null && password.equals(confirmPassword);
         }

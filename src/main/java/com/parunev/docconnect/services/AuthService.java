@@ -12,6 +12,7 @@ import com.parunev.docconnect.models.payloads.user.registration.RegistrationResp
 import com.parunev.docconnect.repositories.PasswordTokenRepository;
 import com.parunev.docconnect.repositories.UserProfileRepository;
 import com.parunev.docconnect.repositories.UserRepository;
+import com.parunev.docconnect.security.exceptions.AlreadyEnabledException;
 import com.parunev.docconnect.security.exceptions.InvalidEmailTokenException;
 import com.parunev.docconnect.security.exceptions.InvalidLoginException;
 import com.parunev.docconnect.security.jwt.JwtService;
@@ -33,7 +34,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
 import java.util.UUID;
 
 import static com.parunev.docconnect.utils.email.Patterns.buildConfirmationEmail;
@@ -172,6 +172,19 @@ public class AuthService {
             confirmationTokenService.setConfirmedAt(token);
 
             dcLogger.info("ConfirmedAt timestamp has been set for token: {}", token);
+
+            if (confirmationToken.getUser().isEnabled()){
+                dcLogger.warn("User already enabled: {}", confirmationToken.getUser().getEmail());
+                throw new AlreadyEnabledException(
+                        AuthenticationError.builder()
+                                .path(authHelpers.getRequest().getRequestURI())
+                                .error("User already enabled.")
+                                .timestamp(LocalDateTime.now())
+                                .status(HttpStatus.BAD_REQUEST)
+                                .build()
+                );
+            }
+
             userRepository.enableAppUser(confirmationToken.getUser().getEmail());
 
             dcLogger.info("User enabled: {}", confirmationToken.getUser().getEmail());
@@ -240,13 +253,10 @@ public class AuthService {
         dcLogger.info("Sending 2FA code to user: {}", verificationRequest.getEmail());
         User user = authHelpers.returnUserIfPresent(verificationRequest.getEmail());
         email2FAuthentication.sendOtp(user, "Generic Message: DocConnect 2FA");
-        return VerificationResponse.builder()
-                .path(authHelpers.getRequest().getRequestURI())
-                .message("2FA code sent successfully!")
-                .emailAddress(verificationRequest.getEmail())
-                .timestamp(LocalDateTime.now())
-                .status(HttpStatus.OK)
-                .build();
+        return authHelpers.createVerificationResponse(
+                "2FA code sent successfully!",
+                verificationRequest.getEmail(),
+                HttpStatus.OK);
     }
 
     /**
@@ -294,24 +304,7 @@ public class AuthService {
     public ForgotPasswordResponse resetPassword(@Valid ResetPasswordRequest request){
         dcLogger.info("Resetting password for user with token: {}", request.getToken());
 
-        PasswordToken passwordToken = Optional.ofNullable(passwordTokenRepository.findByToken(request.getToken()))
-                .flatMap(byToken -> byToken
-                        .filter(
-                                reset ->
-                                        reset.getUsedAt() == null
-                                                && reset
-                                                .getExpiresAt()
-                                                .isAfter(LocalDateTime.now())))
-                .orElseThrow(
-                        () -> {
-                            dcLogger.warn("Token not found or is already used!");
-                            throw new InvalidEmailTokenException(EmailError.builder()
-                                    .path(authHelpers.getRequest().getRequestURI())
-                                    .error("Token not found or is already used!")
-                                    .timestamp(LocalDateTime.now())
-                                    .status(HttpStatus.BAD_REQUEST)
-                                    .build());
-                        });
+        PasswordToken passwordToken = authHelpers.validatePasswordTokenAndProceed(request.getToken());
 
         User user = passwordToken.getUser();
         user.setPassword(passwordEncoder.encode(request.getResetPassword()));

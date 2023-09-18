@@ -1,6 +1,7 @@
 package com.parunev.docconnect.models;
 
 import com.parunev.docconnect.models.commons.BaseEntity;
+import com.parunev.docconnect.models.specialist.Specialist;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -25,16 +26,25 @@ import java.time.LocalDateTime;
 @AttributeOverride(name = "id", column = @Column(name = "CONFIRMATION_TOKEN_ID"))
 public class ConfirmationToken extends BaseEntity {
 
+    /** Timestamp when the confirmation was completed */
     @Column(name = "CONFIRMED_AT")
     private LocalDateTime confirmedAt;
 
+    /** Timestamp when the token expires (must not be null) */
     @Column(name = "EXPIRES_AT", nullable = false)
     private LocalDateTime expiresAt;
 
+    /** The confirmation token string (must not be null) */
     @Column(name = "CONFIRMATION_TOKEN", nullable = false)
     private String token;
 
+    /** The associated user (many-to-one relationship with User) */
     @ManyToOne
-    @JoinColumn(nullable = false, name = "USER_ID")
+    @JoinColumn(name = "USER_ID")
     private User user;
+
+    /** The associated specialist (many-to-one relationship with Specialist) */
+    @ManyToOne
+    @JoinColumn(name = "SPECIALIST_ID")
+    private Specialist specialist;
 }

@@ -1,6 +1,7 @@
 package com.parunev.docconnect.models;
 
 import com.parunev.docconnect.models.commons.BaseEntity;
+import com.parunev.docconnect.models.specialist.Specialist;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -48,6 +49,14 @@ public class PasswordToken extends BaseEntity {
      * This field should not be null, as every token must belong to a specific user.
      */
     @ManyToOne
-    @JoinColumn(nullable = false, name = "USER_ID")
+    @JoinColumn(name = "USER_ID")
     private User user;
+
+    /**
+     * The specialist associated with this password reset token.
+     * This field should not be null, as every token must belong to a specific specialist.
+     */
+    @ManyToOne
+    @JoinColumn(name = "SPECIALIST_ID")
+    private Specialist specialist;
 }

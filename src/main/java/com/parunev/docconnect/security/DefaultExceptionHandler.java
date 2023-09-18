@@ -162,6 +162,32 @@ public class DefaultExceptionHandler {
     }
 
     /**
+     * Handle exceptions of type {@code SpecialistNotFoundException}.
+     * This method handles exceptions specific to the specialist not found exception and returns the
+     * corresponding error response.
+     *
+     * @param ex The {@code SpecialistNotFoundException} instance to handle.
+     * @return A {@code AuthenticationError} containing the error response and HTTP status.
+     */
+    @ExceptionHandler(SpecialistNotFoundException.class)
+    public ResponseEntity<AuthenticationError> handleSpecialistNotFoundException(SpecialistNotFoundException ex) {
+        return new ResponseEntity<>(ex.getError(), ex.getError().getStatus());
+    }
+
+    /**
+     * Handle exceptions of type {@code AlreadyEnabledException}.
+     * This method handles exceptions specific to the already enabled exception and returns the
+     * corresponding error response.
+     *
+     * @param ex The {@code AlreadyEnabledException} instance to handle.
+     * @return A {@code AuthenticationError} containing the error response and HTTP status.
+     */
+    @ExceptionHandler(AlreadyEnabledException.class)
+    public ResponseEntity<AuthenticationError> handleAlreadyEnabledException(AlreadyEnabledException ex) {
+        return new ResponseEntity<>(ex.getAuthenticationError(), ex.getAuthenticationError().getStatus());
+    }
+
+    /**
      * Handle exceptions of type {@code Exception} and {@code RuntimeException}.
      * This method handles all other exceptions and returns the corresponding error response.
      *

@@ -2,6 +2,7 @@ package com.parunev.docconnect.models;
 
 import com.parunev.docconnect.models.commons.BaseEntity;
 import com.parunev.docconnect.models.enums.TokenType;
+import com.parunev.docconnect.models.specialist.Specialist;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -93,7 +94,15 @@ public class JwtToken extends BaseEntity {
      * relationship.
      */
     @ManyToOne
-    @JoinColumn(name = "USER_ID", nullable = false)
+    @JoinColumn(name = "USER_ID")
     private User user;
+
+    /**
+     * The specialist associated with the JWT token, established through a many-to-one
+     * relationship.
+     */
+    @ManyToOne
+    @JoinColumn(name = "SPECIALIST_ID")
+    private Specialist specialist;
 
 }

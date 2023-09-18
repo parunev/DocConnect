@@ -48,13 +48,12 @@ public class SecurityConfig {
                             response.setContentType("application/json");
 
                             HandlerMethod method;
-                            PreAuthorize preAuthorize;
+                            PreAuthorize preAuthorize = null;
 
-                            if (request.getAttribute("org.springframework.web.servlet.HandlerMapping.bestMatchingHandler") != null) {
-                                method = (HandlerMethod) request.getAttribute("org.springframework.web.servlet.HandlerMapping.bestMatchingHandler");
+                            Object bestMatchingHandler = request.getAttribute("org.springframework.web.servlet.HandlerMapping.bestMatchingHandler");
+                            if (bestMatchingHandler instanceof HandlerMethod) {
+                                method = (HandlerMethod) bestMatchingHandler;
                                 preAuthorize = method.getMethodAnnotation(PreAuthorize.class);
-                            } else {
-                                preAuthorize = null;
                             }
 
                             String message = preAuthorize == null ?
@@ -76,6 +75,7 @@ public class SecurityConfig {
                                 .requestMatchers("/api/v1/specialties/**").permitAll()
                                 .requestMatchers("/api/v1/cities/**").permitAll()
                                 .requestMatchers("/api/v1/auth/**").permitAll()
+                                .requestMatchers("/api/v1/specialist/**").permitAll()
                                 .requestMatchers(
                                         "/v2/api-docs",
                                         "/v3/api-docs",

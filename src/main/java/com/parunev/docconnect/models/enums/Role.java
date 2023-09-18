@@ -39,7 +39,12 @@ public enum Role implements GrantedAuthority {
     /**
      * Represents a standard user role.
      */
-    ROLE_USER("ROLE_USER");
+    ROLE_USER("ROLE_USER"),
+
+    /**
+     * Represents a specialist role.
+     */
+    ROLE_SPECIALIST("ROLE_SPECIALIST");
 
     /**
      * The authority string associated with the role.

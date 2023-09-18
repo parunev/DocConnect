@@ -1,6 +1,7 @@
 package com.parunev.docconnect.security.jwt;
 
 import com.parunev.docconnect.models.User;
+import com.parunev.docconnect.models.specialist.Specialist;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import lombok.RequiredArgsConstructor;
@@ -31,6 +32,8 @@ public class JwtService {
 
     private final JwtEncoder jwtEncoder;
     private final JwtDecoder jwtDecoder;
+    private static final String SCOPE = "scope";
+    private static final String ISSUER = "DocConnect_API";
 
     /**
      * Extract the email from a JWT token.
@@ -53,6 +56,16 @@ public class JwtService {
     }
 
     /**
+     * Generate a JWT access token for a specialist.
+     *
+     * @param specialistDetails The specialist for whom to generate the token.
+     * @return The generated JWT access token.
+     */
+    public String generateToken(Specialist specialistDetails) {
+        return generateToken(new HashMap<>(), specialistDetails);
+    }
+
+    /**
      * Generate a JWT refresh token for a user.
      *
      * @param userDetails The user for whom to generate the token.
@@ -60,6 +73,16 @@ public class JwtService {
      */
     public String generateRefreshToken(User userDetails){
         return buildToken(new HashMap<>(), userDetails, refreshExpiration);
+    }
+
+    /**
+     * Generate a JWT refresh token for a specialist.
+     *
+     * @param  specialistDetails specialist for whom to generate the token.
+     * @return The generated JWT refresh token.
+     */
+    public String generateRefreshToken(Specialist specialistDetails){
+        return buildToken(new HashMap<>(), specialistDetails, refreshExpiration);
     }
 
     /**
@@ -75,6 +98,18 @@ public class JwtService {
     }
 
     /**
+     * Generate a JWT token for a specialist with additional claims.
+     *
+     * @param extraClaims Additional claims to include in the token.
+     * @param specialistDetails The specialist for whom to generate the token.
+     * @return The generated JWT token.
+     */
+    public String generateToken(Map<String, Object> extraClaims,
+                                Specialist specialistDetails){
+        return buildToken(extraClaims, specialistDetails, jwtExpiration);
+    }
+
+    /**
      * Build a JWT token with the specified claims, user details, and expiration.
      *
      * @param extraClaims Additional claims to include in the token.
@@ -86,21 +121,49 @@ public class JwtService {
                              User userDetails,
                              long expiration) {
 
-        Map<String, Object> claims = new HashMap<>();
-        claims.put("scope", userDetails.getRole().getAuthority());
-        claims.putAll(extraClaims);
+        JwtClaimsSet.Builder jwtClaimsSetBuilder = buildJwtClaims(userDetails, expiration);
 
-        JwtClaimsSet.Builder jwtClaimsSetBuilder = JwtClaimsSet.builder()
-                .subject(userDetails.getEmail())
-                .issuer("DocConnect_API")
-                .issuedAt(Instant.now())
-                .expiresAt(Instant.now().plus(Duration.ofMillis(expiration)));
-
-        for (Map.Entry<String, Object> entry : claims.entrySet()) {
+        for (Map.Entry<String, Object> entry : createAndReturnClaims(userDetails, extraClaims).entrySet()) {
             jwtClaimsSetBuilder.claim(entry.getKey(), entry.getValue());
         }
 
         return jwtEncoder.encode(JwtEncoderParameters.from(jwtClaimsSetBuilder.build())).getTokenValue();
+    }
+
+    public String buildToken(Map<String, Object> extraClaims,
+                             Specialist specialistDetails,
+                             long expiration) {
+
+        JwtClaimsSet.Builder jwtClaimsSetBuilder = buildJwtClaims(specialistDetails, expiration);
+
+        for (Map.Entry<String, Object> entry : createAndReturnClaims(specialistDetails, extraClaims).entrySet()) {
+            jwtClaimsSetBuilder.claim(entry.getKey(), entry.getValue());
+        }
+
+        return jwtEncoder.encode(JwtEncoderParameters.from(jwtClaimsSetBuilder.build())).getTokenValue();
+    }
+
+    private JwtClaimsSet.Builder buildJwtClaims(Object object, long expiration) {
+        return JwtClaimsSet.builder()
+                .subject(object instanceof User ? ((User) object).getEmail() : ((Specialist) object).getEmail())
+                .issuer(ISSUER)
+                .issuedAt(Instant.now())
+                .expiresAt(Instant.now().plus(Duration.ofMillis(expiration)));
+    }
+
+
+    private Map<String, Object> createAndReturnClaims(Object object, Map<String, Object> extraClaims) {
+        Map<String, Object> claim = new HashMap<>();
+
+        if (object instanceof User) {
+            claim.put(SCOPE, ((User) object).getRole().getAuthority());
+            claim.putAll(extraClaims);
+        } else {
+            claim.put(SCOPE, ((Specialist) object).getRole().getAuthority());
+            claim.putAll(extraClaims);
+        }
+
+        return claim;
     }
 
     /**
