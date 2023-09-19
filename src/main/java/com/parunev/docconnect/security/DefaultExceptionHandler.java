@@ -200,6 +200,30 @@ public class DefaultExceptionHandler {
     }
 
     /**
+     * Handle exceptions of type {@code AppointmentDeniedException}.
+     * This method handles exceptions specific to the appointments denied exception and returns the
+     * corresponding error response.
+     * @param ex The {@code AppointmentDeniedException} instance to handle.
+     * @return A {@code ApiError} containing the error response and HTTP status.
+     */
+    @ExceptionHandler(AppointmentDeniedException.class)
+    public ResponseEntity<ApiError> handleRatingNotFoundException(AppointmentDeniedException ex) {
+        return new ResponseEntity<>(ex.getApiError(), ex.getApiError().getStatus());
+    }
+
+    /**
+     * Handle exceptions of type {@code AppointmentNotFoundException}.
+     * This method handles exceptions specific to the appointments not found exception and returns the
+     * corresponding error response.
+     * @param ex The {@code AppointmentNotFoundException} instance to handle.
+     * @return A {@code ApiError} containing the error response and HTTP status.
+     */
+    @ExceptionHandler(AppointmentNotFoundException.class)
+    public ResponseEntity<ApiError> handleRatingNotFoundException(AppointmentNotFoundException ex) {
+        return new ResponseEntity<>(ex.getApiError(), ex.getApiError().getStatus());
+    }
+
+    /**
      * Handle exceptions of type {@code Exception} and {@code RuntimeException}.
      * This method handles all other exceptions and returns the corresponding error response.
      *

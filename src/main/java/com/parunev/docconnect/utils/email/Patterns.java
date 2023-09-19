@@ -1,7 +1,10 @@
 package com.parunev.docconnect.utils.email;
 
+import com.parunev.docconnect.models.Appointment;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+
+import java.time.format.DateTimeFormatter;
 
 /**
  * A utility class for generating email patterns and templates.
@@ -267,5 +270,341 @@ public class Patterns {
     
     """;
     }
+
+    public static String buildAppointmentCanceledEmail(
+            String patientName,
+            String specialistName,
+            String specialty,
+            String address,
+            Appointment appointment) {
+
+        return """
+<div style="font-family: Helvetica, Arial, sans-serif; font-size: 16px; margin: 0; color: #0b0c0c">
+
+    <table role="presentation" width="100%" style="border-collapse: collapse; min-width: 100%; width: 100% !important" cellpadding="0" cellspacing="0" border="0">
+        <tbody>
+            <tr>
+                <td width="100%" height="53" bgcolor="#0b0c0c">
+                    <table role="presentation" width="100%" style="border-collapse: collapse; max-width: 580px" cellpadding="0" cellspacing="0" border="0" align="center">
+                        <tbody>
+                            <tr>
+                                <td width="70" bgcolor="#0b0c0c" valign="middle">
+                                    <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="border-collapse: collapse">
+                                        <tbody>
+                                            <tr>
+                                                <td style="padding-left: 10px"></td>
+                                                <td style="font-size: 28px; line-height: 1.315789474; Margin-top: 4px; padding-left: 10px">
+                                                    <span style="font-family: Helvetica, Arial, sans-serif; font-weight: 700; color: #ffffff; text-decoration: none; vertical-align: top; display: inline-block">Appointment Canceled Successfully</span>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table role="presentation" class="m_-6186904992287805515content" align="center" cellpadding="0" cellspacing="0" border="0" style="border-collapse: collapse; max-width: 580px; width: 100% !important" width="100%">
+        <tbody>
+            <tr>
+                <td width="10" height="10" valign="middle"></td>
+                <td>
+                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse: collapse">
+                        <tbody>
+                            <tr>
+                                <td bgcolor="#1D70B8" width="100%" height="10"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </td>
+                <td width="10" valign="middle" height="10"></td>
+            </tr>
+        </tbody>
+    </table>
+    <table role="presentation" class="m_-6186904992287805515content" align="center" cellpadding="0" cellspacing="0" border="0" style="border-collapse: collapse; max-width: 580px; width: 100% !important" width="100%">
+        <tbody>
+            <tr>
+                <td height="30"><br></td>
+            </tr>
+            <tr>
+                <td width="10" valign="middle"><br></td>
+                <td style="font-family: Helvetica, Arial, sans-serif; font-size: 19px; line-height: 1.315789474; max-width: 560px">
+                    <p style="Margin: 0 0 20px 0; font-size: 19px; line-height: 25px; color: #0b0c0c">Dear <b>
+                    """
+                + patientName
+                + """
+                    </b>,</p>
+                    <p style="Margin: 0 0 20px 0; font-size: 19px; line-height: 25px; color: #0b0c0c">You have successfully canceled your appointment for:</p>
+                    <p style="Margin: 0 0 20px 0; font-size: 19px; line-height: 25px; color: #0b0c0c"><b>Doctor:</b>
+                    """
+                + specialistName
+                + """
+                    </p>
+                    <p style="Margin: 0 0 20px 0; font-size: 19px; line-height: 25px; color: #0b0c0c"><b>Specialty:</b>
+                     """
+                + specialty
+                + """
+                    </p>
+                    <p style="Margin: 0 0 20px 0; font-size: 19px; line-height: 25px; color: #0b0c0c"><b>Location:</b>
+                    """
+                + address
+                + """
+                    </p>
+                    <p style="Margin: 0 0 20px 0; font-size: 19px; line-height: 25px; color: #0b0c0c"><b>Date & Time:</b>
+                    """
+                + appointment.getDateTime().toLocalDate().format(DateTimeFormatter.ofPattern("MM/dd/yyyy"))
+                + " " + " "
+                + appointment.getDateTime().toLocalTime().format(DateTimeFormatter.ofPattern("ha")).toUpperCase()
+                + """
+                    </p>
+
+        
+                    <p style="color: #000;"><br>Best regards,<br><b>The DocConnect Team</b></p>
+                </td>
+                <td width="10" valign="middle"><br></td>
+            </tr>
+            <tr>
+                <td height="30"><br></td>
+            </tr>
+        </tbody>
+    </table>
+    <div class="yj6qo"></div>
+    <div class="adL"></div>
+</div>
+""";
+    }
+
+    public static String buildAppointmentReminderEmail(
+            String patientName,
+            String specialistName,
+            String specialty,
+            String address,
+            Appointment appointment) {
+
+        return """
+<div style="font-family: Helvetica, Arial, sans-serif; font-size: 16px; margin: 0; color: #0b0c0c">
+
+    <table role="presentation" width="100%" style="border-collapse: collapse; min-width: 100%; width: 100% !important" cellpadding="0" cellspacing="0" border="0">
+        <tbody>
+            <tr>
+                <td width="100%" height="53" bgcolor="#0b0c0c">
+                    <table role="presentation" width="100%" style="border-collapse: collapse; max-width: 580px" cellpadding="0" cellspacing="0" border="0" align="center">
+                        <tbody>
+                            <tr>
+                                <td width="70" bgcolor="#0b0c0c" valign="middle">
+                                    <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="border-collapse: collapse">
+                                        <tbody>
+                                            <tr>
+                                                <td style="padding-left: 10px"></td>
+                                                <td style="font-size: 28px; line-height: 1.315789474; Margin-top: 4px; padding-left: 10px">
+                                                    <span style="font-family: Helvetica, Arial, sans-serif; font-weight: 700; color: #ffffff; text-decoration: none; vertical-align: top; display: inline-block">Upcoming Appointment Reminder</span>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table role="presentation" class="m_-6186904992287805515content" align="center" cellpadding="0" cellspacing="0" border="0" style="border-collapse: collapse; max-width: 580px; width: 100% !important" width="100%">
+        <tbody>
+            <tr>
+                <td width="10" height="10" valign="middle"></td>
+                <td>
+                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse: collapse">
+                        <tbody>
+                            <tr>
+                                <td bgcolor="#1D70B8" width="100%" height="10"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </td>
+                <td width="10" valign="middle" height="10"></td>
+            </tr>
+        </tbody>
+    </table>
+    <table role="presentation" class="m_-6186904992287805515content" align="center" cellpadding="0" cellspacing="0" border="0" style="border-collapse: collapse; max-width: 580px; width: 100% !important" width="100%">
+        <tbody>
+            <tr>
+                <td height="30"><br></td>
+            </tr>
+            <tr>
+                <td width="10" valign="middle"><br></td>
+                <td style="font-family: Helvetica, Arial, sans-serif; font-size: 19px; line-height: 1.315789474; max-width: 560px">
+                    <p style="Margin: 0 0 20px 0; font-size: 19px; line-height: 25px; color: #0b0c0c">Dear <b>
+                    """
+                + patientName
+                + """
+                    </b>,</p>
+                    <p style="Margin: 0 0 20px 0; font-size: 19px; line-height: 25px; color: #0b0c0c">We would like to kindly remind you of your upcoming appointment:</p>
+                    <p style="Margin: 0 0 20px 0; font-size: 19px; line-height: 25px; color: #0b0c0c"><b><br>Doctor:</b>
+                    """
+                + specialistName
+                + """
+                    </p>
+                    <p style="Margin: 0 0 20px 0; font-size: 19px; line-height: 25px; color: #0b0c0c"><b>Specialty:</b>
+                     """
+                + specialty
+                + """
+                    </p>
+                    <p style="Margin: 0 0 20px 0; font-size: 19px; line-height: 25px; color: #0b0c0c"><b>Location:</b>
+                    """
+                + address
+                + """
+                    </p>
+                    <p style="Margin: 0 0 20px 0; font-size: 19px; line-height: 25px; color: #0b0c0c"><b>Date & Time:</b>
+                    """
+                + appointment.getDateTime().toLocalDate().format(DateTimeFormatter.ofPattern("MM/dd/yyyy"))
+                + " " + " "
+                + appointment.getDateTime().toLocalDate().format(DateTimeFormatter.ofPattern("ha")).toUpperCase()
+                + """
+                    </p>
+
+        
+                    <p style="color: #000;"><br>Best regards,<br><b>The DocConnect Team</b></p>
+                </td>
+                <td width="10" valign="middle"><br></td>
+            </tr>
+            <tr>
+                <td height="30"><br></td>
+            </tr>
+        </tbody>
+    </table>
+    <div class="yj6qo"></div>
+    <div class="adL"></div>
+</div>
+""";
+    }
+
+    public static String buildFeedbackEmail(
+            String patientName,
+            String specialistName,
+            String specialty,
+            String address,
+            Appointment appointment,
+            Long specialistId) {
+        return """
+  <div style="font-family: Helvetica, Arial, sans-serif; font-size: 16px; margin: 0; color: #0b0c0c">
+
+        <table role="presentation" width="100%" style="border-collapse: collapse; min-width: 100%; width: 100% !important" cellpadding="0" cellspacing="0" border="0">
+          <tbody>
+            <tr>
+              <td width="100%" height="53" bgcolor="#0b0c0c">
+                <table role="presentation" width="100%" style="border-collapse: collapse; max-width: 580px" cellpadding="0" cellspacing="0" border="0" align="center">
+                  <tbody>
+                    <tr>
+                      <td width="70" bgcolor="#0b0c0c" valign="middle">
+                        <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="border-collapse: collapse">
+                          <tbody>
+                            <tr>
+                              <td style="padding-left: 10px"></td>
+                              <td style="font-size: 28px; line-height: 1.315789474; Margin-top: 4px; padding-left: 10px">
+                                <span style="font-family: Helvetica, Arial, sans-serif; font-weight: 700; color: #ffffff; text-decoration: none; vertical-align: top; display: inline-block">Your Feedback is Important</span>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <table role="presentation" class="m_-6186904992287805515content" align="center" cellpadding="0" cellspacing="0" border="0" style="border-collapse: collapse; max-width: 580px; width: 100% !important" width="100%">
+          <tbody>
+            <tr>
+              <td width="10" height="10" valign="middle"></td>
+              <td>
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse: collapse">
+                  <tbody>
+                    <tr>
+                      <td bgcolor="#1D70B8" width="100%" height="10"></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </td>
+              <td width="10" valign="middle" height="10"></td>
+            </tr>
+          </tbody>
+        </table>
+        <table role="presentation" class="m_-6186904992287805515content" align="center" cellpadding="0" cellspacing="0" border="0" style="border-collapse: collapse; max-width: 580px; width: 100% !important" width="100%">
+          <tbody>
+            <tr>
+              <td height="30"><br></td>
+            </tr>
+            <tr>
+              <td width="10" valign="middle"><br></td>
+              <td style="font-family: Helvetica, Arial, sans-serif; font-size: 19px; line-height: 1.315789474; max-width: 560px">
+                <p style="Margin: 0 0 20px 0; font-size: 19px; line-height: 25px; color: #0b0c0c">Dear <b>
+                """
+                + patientName
+                + """
+                  </b>,</p>
+                <p style="Margin: 0 0 20px 0; font-size: 19px; line-height: 25px; color: #0b0c0c">Thank you for choosing DocConnect. We appreciate you choosing DocConnect again as a secure and convenient tool for managing your appointments. </p>
+
+                <p style="Margin: 0 0 20px 0; font-size: 19px; line-height: 25px; color: #0b0c0c">We value your opinion and feedback. Your experience helps us improve and serve you better. We invite you to visit our website using the link below and leave a review for your last appointment:</p>
+                <p style="Margin: 0 0 20px 0; font-size: 19px; line-height: 25px; color: #0b0c0c"><b>Doctor:</b>
+               """
+                + specialistName
+                + """
+              </p>
+              <p style="Margin: 0 0 20px 0; font-size: 19px; line-height: 25px; color: #0b0c0c"><b>Specialty:</b>
+               """
+                + specialty
+                + """
+              </p>
+              <p style="Margin: 0 0 20px 0; font-size: 19px; line-height: 25px; color: #0b0c0c"><b>Location:</b>
+               """
+                + address
+                + """
+              </p>
+              <p style="Margin: 0 0 20px 0; font-size: 19px; line-height: 25px; color: #0b0c0c"><b>Date & Time:</b>
+             """
+                + appointment.getDateTime().toLocalDate().format(DateTimeFormatter.ofPattern("MM/dd/yyyy"))
+                + " " + " "
+                + appointment.getDateTime().toLocalTime().format(DateTimeFormatter.ofPattern("ha")).toUpperCase()
+                + """
+                </p>
+
+                <blockquote style="Margin: 0 0 20px 0; border-left: 10px solid #b1b4b6; padding: 15px 0 0.1px 15px; font-size: 19px; line-height: 25px">
+                  <p style="Margin: 0 0 20px 0; font-size: 19px; line-height: 25px; color: #0b0c0c">
+                    <a href=
+                  """
+                + "{YOUR_FRONTEND_URL}"
+                + "/specialists/doctor/"
+                + specialistId
+                + "#create"
+                + """
+                          >Leave a Review</a>
+                  </p>
+                </blockquote>
+
+                <p style="color: #000;">Your feedback helps us grow. Thank you for your time!</p>
+                <p style="color: #000;">Best regards,<br>
+                  <b>The DocConnect Team</b></p>
+              </td>
+              <td width="10" valign="middle"><br></td>
+            </tr>
+            <tr>
+              <td height="30"><br></td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="yj6qo"></div>
+        <div class="adL">
+        </div>
+      </div>
+""";
+    }
+
 
 }
