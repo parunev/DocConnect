@@ -85,7 +85,7 @@ public class CityService {
                 .cityName(cityRepository.save(city).getCityName())
                 .countryName(country.getCountryName())
                 .timestamp(LocalDateTime.now())
-                .status(HttpStatus.OK)
+                .status(HttpStatus.CREATED)
                 .build();
     }
 
