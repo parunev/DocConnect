@@ -16,6 +16,13 @@ import java.io.IOException;
 
 import static com.parunev.docconnect.security.oauth2.HttpCookieRequestRepository.REDIRECT_URI_PARAM_COOKIE_NAME;
 
+/**
+ * Handler for handling OAuth2 authentication failures.
+ * This class is responsible for handling authentication failures during the OAuth2 authentication process. It extends
+ * the Spring Security's SimpleUrlAuthenticationFailureHandler and overrides the onAuthenticationFailure method to
+ * perform custom handling. When an OAuth2 authentication failure occurs, this handler logs the error, redirects the
+ * user to an appropriate error page, and removes any stored authorization request cookies.
+ */
 @Component
 @RequiredArgsConstructor
 public class OAuth2FailureHandler extends SimpleUrlAuthenticationFailureHandler {
@@ -23,6 +30,14 @@ public class OAuth2FailureHandler extends SimpleUrlAuthenticationFailureHandler 
     private final HttpCookieRequestRepository httpCookieRequestRepository;
     private final DCLogger dcLogger = new DCLogger(OAuth2FailureHandler.class);
 
+    /**
+     * Handle OAuth2 authentication failure.
+     *
+     * @param request    The HTTP servlet request.
+     * @param response   The HTTP servlet response.
+     * @param exception  The authentication exception.
+     * @throws IOException If an I/O error occurs during the handling of the failure.
+     */
     @Override
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException {
         dcLogger.error("OAuth2 authentication failure: {}", exception, exception.getMessage());

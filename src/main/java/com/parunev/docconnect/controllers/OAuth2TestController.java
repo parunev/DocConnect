@@ -30,17 +30,27 @@ public class OAuth2TestController {
     @GetMapping("/oauth2/redirect")
     public ResponseEntity<LoginResponse> test(
             @RequestParam(name = "accessToken", required = false) String accessToken,
-            @RequestParam(name = "refreshToken", required = false) String refreshToken
+            @RequestParam(name = "refreshToken", required = false) String refreshToken,
+            @RequestParam(name = "error", required = false) String error
     ){
-        JwtToken jwtToken = jwtTokenRepository.findByToken(accessToken).orElse(null);
+        if (error != null){
+            return ResponseEntity.ok(LoginResponse.builder()
+                    .message(error)
+                    .status(HttpStatus.OK)
+                    .timestamp(LocalDateTime.now())
+                    .build());
+        } else {
+            JwtToken jwtToken = jwtTokenRepository.findByToken(accessToken).orElse(null);
 
-        return ResponseEntity.ok(LoginResponse.builder()
-                .message("OAuth2 Registration or Login success")
-                .emailAddress(jwtToken.getUser().getEmail())
-                .accessToken(accessToken)
-                .refreshToken(refreshToken)
-                .status(HttpStatus.OK)
-                .timestamp(LocalDateTime.now())
-                .build());
+
+            return ResponseEntity.ok(LoginResponse.builder()
+                    .message("OAuth2 Registration or Login success")
+                    .emailAddress(jwtToken != null ? jwtToken.getUser().getEmail() : null)
+                    .accessToken(accessToken)
+                    .refreshToken(refreshToken)
+                    .status(HttpStatus.OK)
+                    .timestamp(LocalDateTime.now())
+                    .build());
+        }
     }
 }

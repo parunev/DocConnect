@@ -25,6 +25,11 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+/**
+ * Custom implementation of the OAuth2 user service that handles the processing of OAuth2 user information.
+ * This service extends the Spring Security's DefaultOAuth2UserService and is responsible for loading and processing
+ * OAuth2 user details obtained from an OAuth2 provider (e.g., Google, Facebook).
+ */
 @Service
 @RequiredArgsConstructor
 public class CustomOAuth2UserService extends DefaultOAuth2UserService {
@@ -35,6 +40,13 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
     private final AuthHelpers authHelpers;
     private final DCLogger dcLogger = new DCLogger(CustomOAuth2UserService.class);
 
+    /**
+     * Load and process the OAuth2 user information.
+     *
+     * @param oAuth2UserRequest The OAuth2 user request containing information about the OAuth2 provider.
+     * @return The processed OAuth2 user with additional details.
+     * @throws OAuth2AuthenticationException If there's an authentication error during OAuth2 user processing.
+     */
     @Override
     public OAuth2User loadUser(OAuth2UserRequest oAuth2UserRequest) throws OAuth2AuthenticationException {
         String correlationId = UUID.randomUUID().toString();
@@ -67,6 +79,13 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         }
     }
 
+    /**
+     * Process the OAuth2 user information, either by updating an existing user or registering a new OAuth2 user.
+     *
+     * @param oAuth2UserRequest The OAuth2 user request containing information about the OAuth2 provider.
+     * @param oAuth2User        The OAuth2 user information obtained from the provider.
+     * @return The processed OAuth2 user with additional details.
+     */
     private OAuth2User processOAuth2User(OAuth2UserRequest oAuth2UserRequest, OAuth2User oAuth2User) {
         dcLogger.info("Processing OAuth2 user: {}", oAuth2User.getAttributes().get("email"));
 
@@ -85,6 +104,12 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         }
     }
 
+    /**
+     * Register a new OAuth2 user with the provided user information.
+     *
+     * @param oAuth2UserInfo The OAuth2 user information.
+     * @return The newly registered OAuth2 user.
+     */
     private OAuth2User registerNewOAuth2User(OAuth2UserInfo oAuth2UserInfo) {
         dcLogger.info("Registering new OAuth2 user. Name: {} Email: {}",
                 oAuth2UserInfo.getName(), oAuth2UserInfo.getEmail());
@@ -112,6 +137,13 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         return user;
     }
 
+    /**
+     * Update the information of an existing user with the provided OAuth2 user information.
+     *
+     * @param user          The existing user to be updated.
+     * @param oAuth2UserInfo The OAuth2 user information.
+     * @return The updated OAuth2 user.
+     */
     private OAuth2User updateExistingUser(User user, OAuth2UserInfo oAuth2UserInfo) {
         dcLogger.info("Updating existing user with OAuth2 information: {}", user.getEmail());
 

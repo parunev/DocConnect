@@ -31,6 +31,13 @@ import java.util.stream.Stream;
 
 import static com.parunev.docconnect.security.oauth2.HttpCookieRequestRepository.REDIRECT_URI_PARAM_COOKIE_NAME;
 
+/**
+ * Handler for handling successful OAuth2 authentication.
+ * This class is responsible for handling successful OAuth2 authentication. It extends Spring Security's
+ * SimpleUrlAuthenticationSuccessHandler and overrides the onAuthenticationSuccess method to perform custom handling.
+ * After successful authentication, it generates JWT tokens, revokes previous tokens for the user, and redirects the
+ * user to the appropriate target URL, including the access and refresh tokens as query parameters.
+ */
 @Component
 @RequiredArgsConstructor
 public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
@@ -42,6 +49,14 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
     private final JwtTokenRepository jwtTokenRepository;
     private final DCLogger dcLogger = new DCLogger(OAuth2SuccessHandler.class);
 
+    /**
+     * Handle successful OAuth2 authentication.
+     *
+     * @param request        The HTTP servlet request.
+     * @param response       The HTTP servlet response.
+     * @param authentication The authentication object representing the authenticated user.
+     * @throws IOException If an I/O error occurs during the handling of the success.
+     */
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
                                         Authentication authentication) throws IOException {
@@ -59,6 +74,14 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         getRedirectStrategy().sendRedirect(request, response, targetUrl);
     }
 
+    /**
+     * Determine the target URL for redirection after successful authentication.
+     *
+     * @param request        The HTTP servlet request.
+     * @param response       The HTTP servlet response.
+     * @param authentication The authentication object representing the authenticated user.
+     * @return The target URL for redirection, including access and refresh tokens as query parameters.
+     */
     @Override
     protected String determineTargetUrl(HttpServletRequest request, HttpServletResponse response,
                                         Authentication authentication) {
@@ -101,11 +124,23 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
                 .build().toUriString();
     }
 
+    /**
+     * Clear authentication-related attributes and cookies.
+     *
+     * @param request  The HTTP servlet request.
+     * @param response The HTTP servlet response.
+     */
     protected void clearAuthenticationAttributes(HttpServletRequest request, HttpServletResponse response) {
         super.clearAuthenticationAttributes(request);
         httpCookieRepository.removeAuthorizationRequestCookies(request, response);
     }
 
+    /**
+     * Check if the provided URI is an authorized redirect URI.
+     *
+     * @param uri The URI to check.
+     * @return True if the URI is an authorized redirect URI, otherwise false.
+     */
     private boolean isAuthorizedRedirectUri(String uri) {
         URI clientRedirectUri = URI.create(uri);
 
