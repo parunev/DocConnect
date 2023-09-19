@@ -6,19 +6,25 @@ import io.swagger.v3.oas.annotations.enums.SecuritySchemeIn;
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
 import io.swagger.v3.oas.annotations.info.Contact;
 import io.swagger.v3.oas.annotations.info.Info;
+import io.swagger.v3.oas.annotations.info.License;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.security.SecurityScheme;
 import io.swagger.v3.oas.annotations.servers.Server;
 
 @OpenAPIDefinition(
         info = @Info(
-                contact = @Contact(name = "DocConnect Team"),
+                contact = @Contact(
+                        name = "DocConnect Team (Martin Parunev for this code",
+                        email = "parunev@gmail.com"),
                 description = "A web-based platform that facilitates appointment booking with doctors in different medical fields.\n" +
                         "It also provides a doctor search feature to help users find specific doctors based on specialties and locations.",
-                title = "DocConnect REST API"
+                title = "DocConnect REST API",
+                license = @License(
+                        url = "https://github.com/parunev/DocConnect/blob/main/LICENSE",
+                        name = "MIT License"
+                )
         ),
-        servers = {
-                @Server(description = "Local Environment BE", url = "http://localhost:8080"),
+        servers = {@Server(description = "Local Environment BE", url = "http://localhost:8080"),
         },
         security = @SecurityRequirement(name = "bearerAuth")
 )
