@@ -24,6 +24,7 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -427,5 +428,37 @@ public class AuthHelpers {
                                     .status(HttpStatus.BAD_REQUEST)
                                     .build());
                         });
+    }
+
+    /**
+     * Extracts the full name from a provided name string.
+     *
+     * @param name The input name string from which the full name is to be extracted.
+     * @return An array containing the first and last names extracted from the input name.
+     * @throws FullNameNotFoundException If the full name or last name is not found in the input name.
+     */
+    public String[] extractFullName(String name) {
+        String[] nameParts = name.split(" ", 2);
+
+        if (nameParts.length >= 2) {
+            dcLogger.info("Full name validated and extracted successfully: {}", Arrays.toString(nameParts));
+            return nameParts;
+        } else if (nameParts.length == 1) {
+            dcLogger.warn("Only first name was found through the provider.");
+            throw new FullNameNotFoundException(AuthenticationError.builder()
+                    .path(request.getRequestURI())
+                    .error("Only first name was found through your provider!")
+                    .timestamp(LocalDateTime.now())
+                    .status(HttpStatus.NOT_FOUND)
+                    .build());
+        } else {
+            dcLogger.warn("Full name is not available from the provider.");
+            throw new FullNameNotFoundException(AuthenticationError.builder()
+                    .path(request.getRequestURI())
+                    .error("Full name is not available from the provider.")
+                    .timestamp(LocalDateTime.now())
+                    .status(HttpStatus.NOT_FOUND)
+                    .build());
+        }
     }
 }

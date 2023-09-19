@@ -1,6 +1,7 @@
 package com.parunev.docconnect.config;
 
 import com.parunev.docconnect.security.SpringSecurityAuditorAware;
+import com.parunev.docconnect.security.oauth2.OAuthProperties;
 import com.parunev.docconnect.services.UserService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -19,10 +20,16 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @Configuration
 @RequiredArgsConstructor
 @EnableJpaAuditing(auditorAwareRef = "auditorAware")
-@EnableConfigurationProperties(value = {RsaConfig.class})
+@EnableConfigurationProperties(value = {RsaConfig.class, OAuthProperties.class})
 public class ApplicationConfig {
 
     private final UserService userService;
+
+    // @Value("${azure.communication.endpoint}")
+    private String communicationEndpoint;
+
+    // @Value("${azure.communication.credential}")
+    private String communicationCredential;
 
     @Bean
     public AuditorAware<String> auditorAware() {
@@ -51,4 +58,12 @@ public class ApplicationConfig {
         authenticationProvider.setPasswordEncoder(passwordEncoder());
         return new ProviderManager(authenticationProvider);
     }
+
+//    @Bean
+//    public EmailClient emailClient(){
+//        return new EmailClientBuilder()
+//                .endpoint(communicationEndpoint)
+//                .credential(new AzureKeyCredential(communicationCredential))
+//                .buildClient();
+//    }
 }

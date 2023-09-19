@@ -135,7 +135,7 @@ public class User extends BaseEntity implements OAuth2User, UserDetails {
      * The gender of the user.
      */
     @Enumerated(EnumType.STRING)
-    @Column(name = "GENDER", nullable = false)
+    @Column(name = "GENDER")
     private Gender gender;
 
     /**

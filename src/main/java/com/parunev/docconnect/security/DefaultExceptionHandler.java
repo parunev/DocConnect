@@ -224,6 +224,18 @@ public class DefaultExceptionHandler {
     }
 
     /**
+     * Handle exceptions of type {@code FullNameNotFoundException}.
+     * This method handles exceptions specific to the full name not found exception and returns the
+     * corresponding error response.
+     * @param ex The {@code FullNameNotFoundException} instance to handle.
+     * @return A {@code AuthenticationError} containing the error response and HTTP status.
+     */
+    @ExceptionHandler(FullNameNotFoundException.class)
+    public ResponseEntity<AuthenticationError> handleRatingNotFoundException(FullNameNotFoundException ex) {
+        return new ResponseEntity<>(ex.getError(), ex.getError().getStatus());
+    }
+
+    /**
      * Handle exceptions of type {@code Exception} and {@code RuntimeException}.
      * This method handles all other exceptions and returns the corresponding error response.
      *
