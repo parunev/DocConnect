@@ -56,14 +56,15 @@ public class CountryService {
         Country country = Country.builder()
                 .countryName(request.getCountryName())
                 .build();
+        countryRepository.save(country);
 
         dcLogger.info("Country with name {} was added", request.getCountryName());
         return CountryResponse.builder()
                 .path(httpServletRequest.getRequestURI())
                 .message("Country was added")
-                .countryName(countryRepository.save(country).getCountryName())
+                .countryName(country.getCountryName())
                 .timestamp(LocalDateTime.now())
-                .status(HttpStatus.OK)
+                .status(HttpStatus.CREATED)
                 .build();
     }
 
@@ -79,6 +80,7 @@ public class CountryService {
 
         dcLogger.info("Country with id {} was updated", id);
         country.setCountryName(request.getCountryName());
+        countryRepository.save(country);
 
         return CountryResponse.builder()
                 .path(httpServletRequest.getRequestURI())
@@ -99,11 +101,11 @@ public class CountryService {
         Country country = findCountryById(id);
 
         dcLogger.info("Country with id {} was removed", id);
-        countryRepository.deleteById(id);
+        countryRepository.deleteById(country.getId());
 
         return CountryResponse.builder()
                 .path(httpServletRequest.getRequestURI())
-                .message("Country with id:%d removed".formatted(country.getId()))
+                .message("Country with id:%d removed".formatted(id))
                 .countryName(null)
                 .timestamp(LocalDateTime.now())
                 .status(HttpStatus.OK)
@@ -133,9 +135,9 @@ public class CountryService {
         return modelMapper.map(findCountryById(id), CountryResponse.class);
     }
 
-    private Country findCountryById(Long id){
+    public Country findCountryById(Long id){
         return countryRepository.findById(id)
-                .orElseGet(() -> {
+                .orElseThrow(() -> {
                     dcLogger.warn("Country with id {} not found", id);
 
                     throw new CountryServiceException(CountryResponse.builder()
