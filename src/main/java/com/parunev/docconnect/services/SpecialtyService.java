@@ -70,7 +70,7 @@ public class SpecialtyService {
                 .specialtyName(request.getSpecialtyName())
                 .imageUrl(request.getImageUrl())
                 .timestamp(LocalDateTime.now())
-                .status(HttpStatus.OK)
+                .status(HttpStatus.CREATED)
                 .build();
     }
 
