@@ -49,7 +49,7 @@ public class AppointmentHelpers {
         validateSpecialistAvailability(specialist, appointmentRequest);
     }
 
-    private void validateSpecialistAvailability(Specialist specialist, AppointmentRequest appointmentRequest) {
+    public void validateSpecialistAvailability(Specialist specialist, AppointmentRequest appointmentRequest) {
         dcLogger.info("Validating specialist availability for appointment on date: {} and time: {}"
                 , appointmentRequest.getDateTime().toLocalDate(), appointmentRequest.getDateTime().toLocalTime());
 
@@ -63,7 +63,7 @@ public class AppointmentHelpers {
         dcLogger.info("Specialist availability validated");
     }
 
-    private void validateUserAppointments(User user, AppointmentRequest appointmentRequest) {
+    public void validateUserAppointments(User user, AppointmentRequest appointmentRequest) {
         dcLogger.info("Validating user appointments for appointment on date: {} and time: {}"
                 , appointmentRequest.getDateTime().toLocalDate(), appointmentRequest.getDateTime().toLocalTime());
 
@@ -77,7 +77,7 @@ public class AppointmentHelpers {
         dcLogger.info("User appointments validated");
     }
 
-    private void validateUserSpecialistAppointment(Long userId, Long specialistId, LocalDate date) {
+    public void validateUserSpecialistAppointment(Long userId, Long specialistId, LocalDate date) {
         dcLogger.debug("Validating user specialist appointment - User ID: {}, Specialist ID: {}, Date: {}", userId, specialistId, date);
         List<Appointment> appointments = appointmentRepository.findAllByUserIdAndSpecialistId(userId, specialistId);
 
@@ -122,7 +122,7 @@ public class AppointmentHelpers {
         dcLogger.info("Appointment validation successful");
     }
 
-    private void validateDateTime(LocalDate date, LocalTime time) {
+    public void validateDateTime(LocalDate date, LocalTime time) {
         if (!isWeekday(date.getDayOfWeek()) || !isWithinRange(time, LocalTime.of(8, 59), LocalTime.of(16, 1))) {
             dcLogger.warn("Methods(isWeekDay, isWithinRange): Date:{} Time:{}", date, time);
             throw new AppointmentDeniedException(ApiError.builder()
