@@ -48,7 +48,7 @@ class AppointmentHelpersTest {
         AppointmentRequest appointmentRequest = new AppointmentRequest();
         // this needs to be changed or verified everytime on a CI/CD pipeline
         // not quite sure how to find a way around this
-        appointmentRequest.setDateTime(LocalDateTime.of(2023,9,21,15, 0));
+        appointmentRequest.setDateTime(LocalDateTime.of(2023,9,22,16, 0));
 
         when(appointmentRepository.findAllByUserId(user.getId())).thenReturn(new ArrayList<>());
         when(appointmentRepository.findAllBySpecialistId(specialist.getId())).thenReturn(new ArrayList<>());
