@@ -148,6 +148,7 @@ public class UserProfileHelpers {
     public boolean checkPasswordMatching(String oldPassword, String password) {
         if (passwordEncoder.matches(oldPassword, password)) {
             dcLogger.info("Old password matches the one in the database /PROCEED.");
+            return true;
         } else {
             dcLogger.warn("Old password does not match the one in the database /ABORT.");
             throw new InvalidPasswordChangeException(AuthenticationError.builder()
@@ -157,7 +158,6 @@ public class UserProfileHelpers {
                     .status(HttpStatus.BAD_REQUEST)
                     .build());
         }
-        return true;
     }
 
     /**
